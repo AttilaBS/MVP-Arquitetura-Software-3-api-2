@@ -8,6 +8,7 @@ from model import EmailSender
 from model import Session
 from logger import logger
 from schemas import *
+import requests
 
 info = Info(title = 'Email sender API', version = '1.0.0')
 app = OpenAPI(__name__, info = info)
@@ -24,23 +25,23 @@ def documentation():
     '''
     return redirect('/openapi')
 
-@app.post('/prepare', tags = [email_sender_tag],
-         responses = {'200': EmailSentSchema, '404': SentEmailErrorSchema})
-def prepare(query: EmailSentSchema):
+@app.post('/prepare', tags = [email_sender_tag])
+def prepare():
     '''
         Esta rota envia um email com as informações do lembrete, ao email cadastrado.
     '''
-    logger.debug('chegou na api 2')
+    data = request.get_json()
     email_sender = EmailSender(
-        payload.name,
-        payload.description,
-        payload.due_date,
-        payload.email_receiver)
+        data['name'],
+        data['description'],
+        data['due_date'],
+        data['email_receiver']
+        )
     try:
         email_sender.prepare_and_send_email(flag_due_date = True)
-        return {'mensagem': f'Email avisando do prazo final do lembrete enviado para o destinatário: {email_receiver}'}, 200
+        return {'mensagem': f"Email avisando do prazo final do lembrete enviado para o destinatário: {data['email_receiver']}"}, 200
     except Exception as error:
-        logger.warning('Erro ao validar e enviar email para lembrete# %d - erro : %s', reminder.id, error)
+        logger.warning('Erro ao validar e enviar email - erro : %s', error)
         return {'mensagem': 'Ocorreu um erro ao enviar o email.'}, 404
     # else:
     #     if not reminder.email_relationship[0].email:

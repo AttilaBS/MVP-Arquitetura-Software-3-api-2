@@ -1,4 +1,6 @@
 .env
 log/*
 database/*
-__pycache__/*
+__pycache__/
+model/__pycache__/
+schemas/__pycache__/

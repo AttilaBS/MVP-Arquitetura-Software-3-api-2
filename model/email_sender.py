@@ -6,6 +6,7 @@ import ssl
 import smtplib
 from dotenv import load_dotenv
 from model import Base
+from logger import logger
 
 load_dotenv('../.env')
 
@@ -19,8 +20,8 @@ class EmailSender(Base):
     description = Column(String(255))
     due_date = Column(DateTime)
     email_receiver = Column(String(255))
-    subject = Column(String(255))
-    template = Column(String(1500))
+    subject = Column(String(255), default = 'Aviso de Lembrete')
+    email_content = Column(String(1500), default = None)
 
     def __init__(
         self,
@@ -50,16 +51,7 @@ class EmailSender(Base):
         message = EmailMessage()
         if flag_create or flag_update:
             term = 'criado' if flag_update is None else 'atualizado'
-            message.set_content(f'''
-                    Olá usuário(a), este é um email automatizado para avisar
-                    que o lembrete nome:  {self.name}, de descrição:
-                    {self.description}, e com data final: {self.due_date},
-                    foi {term}.
-
-                    Atenciosamente,
-                    Aplicativo Lembretes
-                ''')
-            message.add_alternative(f'''\
+            self.email_content = message.set_content(f'''\
             <!DOCTYPE html>
                 <html>
                     <body>
@@ -75,6 +67,15 @@ class EmailSender(Base):
                     </body>
                 </html>
             ''', subtype = 'html')
+            message.add_alternative(f'''
+                    Olá usuário(a), este é um email automatizado para avisar
+                    que o lembrete nome:  {self.name}, de descrição:
+                    {self.description}, e com data final: {self.due_date},
+                    foi {term}.
+
+                    Atenciosamente,
+                    Aplicativo Lembretes
+                ''')
         elif flag_due_date:
             message.set_content(f'''
                     Olá usuário(a), este é um email automatizado para avisar
