@@ -28,7 +28,7 @@ dictConfig({
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "detailed",
             "filename": "log/error.log",
-            "maxBytes": 10000,
+            "maxBytes": 100000,
             "backupCount": 10,
             "delay": "True",
         },
@@ -36,7 +36,7 @@ dictConfig({
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "detailed",
             "filename": "log/detailed.log",
-            "maxBytes": 10000,
+            "maxBytes": 100000,
             "backupCount": 10,
             "delay": "True",
         }

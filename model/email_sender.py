@@ -1,12 +1,13 @@
-'''Module responsible for email formatting and sending'''
+'''Module responsible for email persistence, formatting and sending'''
 import os
 from email.message import EmailMessage
-from sqlalchemy import Column, String, Integer, DateTime, Boolean
+from datetime import datetime
+from sqlalchemy import Column, String, DateTime, Integer
 import ssl
 import smtplib
+from typing import Union
 from dotenv import load_dotenv
 from model import Base
-from logger import logger
 
 load_dotenv('../.env')
 
@@ -18,10 +19,12 @@ class EmailSender(Base):
     id = Column('pk_email_sender', Integer, primary_key = True)
     name = Column(String(60))
     description = Column(String(255))
-    due_date = Column(DateTime)
+    due_date = Column(String(25))
     email_receiver = Column(String(255))
     subject = Column(String(255), default = 'Aviso de Lembrete')
     email_content = Column(String(1500), default = None)
+    created_at = Column(DateTime, default = datetime.now())
+    updated_at = Column(DateTime, default = None)
 
     def __init__(
         self,
@@ -31,7 +34,9 @@ class EmailSender(Base):
         email_receiver: str,
         subject: str = 'Aviso de Lembrete',
         email_sender: str = os.environ.get('EMAIL_SENDER'),
-        email_password: str = os.environ.get('APP_PASSWORD')):
+        email_password: str = os.environ.get('APP_PASSWORD'),
+        created_at: Union[DateTime, None] = None,
+        updated_at: Union[DateTime, None] = None):
         self.name = name
         self.description = description
         self.due_date = due_date
@@ -40,18 +45,18 @@ class EmailSender(Base):
         self.email_sender = email_sender
         self.email_password = email_password
 
-    def prepare_and_send_email(
-            self,
-            flag_create: bool = None,
-            flag_update: bool = None,
-            flag_due_date: bool = None) -> None:
+        if not created_at:
+            self.created_at = created_at
+        if not updated_at:
+            self.updated_at = updated_at
+
+    def set_content(self, flag):
         '''
             Function to create the email and send it.
         '''
-        message = EmailMessage()
-        if flag_create or flag_update:
-            term = 'criado' if flag_update is None else 'atualizado'
-            self.email_content = message.set_content(f'''\
+        if flag['create'] or flag['update']:
+            term = 'criado' if flag['update'] is False else 'atualizado'
+            self.email_content = f'''
             <!DOCTYPE html>
                 <html>
                     <body>
@@ -66,27 +71,9 @@ class EmailSender(Base):
                             </div>
                     </body>
                 </html>
-            ''', subtype = 'html')
-            message.add_alternative(f'''
-                    Olá usuário(a), este é um email automatizado para avisar
-                    que o lembrete nome:  {self.name}, de descrição:
-                    {self.description}, e com data final: {self.due_date},
-                    foi {term}.
-
-                    Atenciosamente,
-                    Aplicativo Lembretes
-                ''')
-        elif flag_due_date:
-            message.set_content(f'''
-                    Olá usuário(a), este é um email automatizado para avisar
-                    que o lembrete nome:  {self.name}, de descrição:
-                    {self.description}, e com data final: {self.due_date},
-                    está próximo à data estipulada.
-
-                    Atenciosamente,
-                    Aplicativo Lembretes
-                ''')
-            message.add_alternative(f'''\
+            '''
+        elif flag['due_date']:
+            self.email_content = f'''
             <!DOCTYPE html>
                 <html>
                     <body>
@@ -101,7 +88,12 @@ class EmailSender(Base):
                             </div>
                     </body>
                 </html>
-            ''', subtype = 'html')
+            '''
+
+
+    def send_email(self):
+        message = EmailMessage()
+        message.set_content(self.email_content, subtype = 'html')
         message['From'] = self.email_sender
         message['To'] = self.email_receiver
         message['Subject'] = self.subject
