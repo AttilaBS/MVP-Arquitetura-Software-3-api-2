@@ -36,7 +36,7 @@
 ## Como executar
    Para instruções detalhadas de como executar, verificar o README da api1.
 
-## Responsabilidades dos arquivos do projeto
+## Responsabilidades dos arquivos do componente
 
 ## Pasta database:
   ### db.sqlite3
