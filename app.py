@@ -12,16 +12,7 @@ info = Info(title = 'Email sender API', version = '1.0.0')
 app = OpenAPI(__name__, info = info)
 CORS(app)
 
-documentation_tag = Tag(name = 'Documentação', description = 'Seleção de documentação do envio de emails: Swagger')
 email_sender_tag = Tag(name = 'Rota de envio de Email', description = 'Envia um email de lembrete na sua criação ou atualização caso seja selecionada a opção.')
-
-
-@app.get('/', tags = [documentation_tag])
-def documentation():
-    '''
-        Redireciona para openapi, com a documentação das rotas da API.
-    '''
-    return redirect('/openapi')
 
 @app.post('/prepare', tags = [email_sender_tag])
 def prepare():
@@ -41,7 +32,7 @@ def prepare():
         session.add(email_sender)
         session.commit()
         EmailSender.send_email(email_sender)
-        return {'mensagem': f"Email avisando do prazo final do lembrete enviado para o destinatário: {email_sender.email_receiver}"}, 200
+        return {'mensagem': 'Email com informações do lembrete enviado para o destinatário: %s', 'email': email_sender.email_receiver}, 200
     except Exception as error:
         logger.warning('Erro ao validar e enviar email - erro : %s', error)
         return {'mensagem': 'Ocorreu um erro ao enviar o email.'}, 404
