@@ -60,7 +60,7 @@ class EmailSender(Base):
             <!DOCTYPE html>
                 <html>
                     <body>
-                        <h1 style="color:#dd8888;">Lembrete:</h1>
+                        <h1 style="color:#2b89ad;">Lembrete:</h1>
                             <div><p>Olá usuário(a), este é um email automatizado
                             para avisar </br> que o lembrete nome: <strong>{self.name}</strong> 
                             </br> de descrição: <strong>{self.description}</strong>,
@@ -77,7 +77,7 @@ class EmailSender(Base):
             <!DOCTYPE html>
                 <html>
                     <body>
-                        <h1 style="color:#dd8888;">Lembrete:</h1>
+                        <h1 style="color:#2b89ad;">Lembrete:</h1>
                             <div><p>Olá usuário(a), este é um email automatizado
                             para avisar </br> que o lembrete nome: <strong>{self.name}</strong>
                             </br> de descrição: <strong>{self.description}</strong>,
