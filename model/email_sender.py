@@ -66,8 +66,7 @@ class EmailSender(Base):
                             </br> de descrição: <strong>{self.description}</strong>,
                             e com data final: <strong>{self.due_date}</strong>,
                             </br> foi {term}.</p>
-                                <p>Atenciosamente,</p>
-                                <p>Aplicativo Lembretes</p>
+                                <p>Reminder Web</p>
                             </div>
                     </body>
                 </html>
@@ -83,8 +82,7 @@ class EmailSender(Base):
                             </br> de descrição: <strong>{self.description}</strong>,
                             e com data final: <strong>{self.due_date}</strong>,
                             </br> está próximo à data estipulada.</p>
-                                <p>Atenciosamente,</p>
-                                <p>Aplicativo Lembretes</p>
+                                <p>Reminder Web</p>
                             </div>
                     </body>
                 </html>
